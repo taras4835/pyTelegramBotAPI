@@ -415,8 +415,9 @@ class StateFilter(AdvancedCustomFilter):
             user_id = message.from_user.id
             message = message.message
 
-        
-        
+        if isinstance(message, types.PollAnswer):
+            chat_id = message.voter_chat.id
+            user_id = message.user.id
 
         if isinstance(text, list):
             new_text = []
