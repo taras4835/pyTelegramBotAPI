@@ -403,20 +403,19 @@ class StateFilter(AdvancedCustomFilter):
         :meta private:
         """
         if text == '*': return True
-        
+
         # needs to work with callbackquery
         if isinstance(message, types.Message):
             chat_id = message.chat.id
             user_id = message.from_user.id
 
         if isinstance(message, types.CallbackQuery):
-            
             chat_id = message.message.chat.id
             user_id = message.from_user.id
             message = message.message
 
         if isinstance(message, types.PollAnswer):
-            chat_id = message.voter_chat.id
+            chat_id = message.user.id
             user_id = message.user.id
 
         if isinstance(text, list):
@@ -427,8 +426,8 @@ class StateFilter(AdvancedCustomFilter):
             text = new_text
         elif isinstance(text, State):
             text = text.name
-        
-        if message.chat.type in ['group', 'supergroup']:
+
+        if (not isinstance(message, types.PollAnswer)) and message.chat.type in ['group', 'supergroup']:
             group_state = self.bot.current_states.get_state(chat_id, user_id)
             if group_state == text:
                 return True
@@ -438,6 +437,7 @@ class StateFilter(AdvancedCustomFilter):
 
         else:
             user_state = self.bot.current_states.get_state(chat_id, user_id)
+            print(user_state, text)
             if user_state == text:
                 return True
             elif type(text) is list and user_state in text:
